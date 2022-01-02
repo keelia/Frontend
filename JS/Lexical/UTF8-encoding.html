@@ -1,0 +1,42 @@
+<script>
+    function UTF8_encoding(char){
+        const codePoint = char.charCodeAt(0);
+        const codePointInBinary = codePoint.toString(2);
+        const ranges = {
+            1:[0,0x7f],
+            2:[80,0x7ff],
+            3:[800,0xffff],
+            4:[10000,0x1fffff]
+        }
+        const charBytes = Number(Object.keys(ranges).find(range=>(codePoint>=ranges[range][0] && codePoint<=ranges[range][1])));
+        if(charBytes === 1){
+            return [new Array(8-codePointInBinary.toString(2).length+1).join('0') + codePointInBinary.toString(2)]
+        }else{
+            const firstByte = [],restBytes = [];
+            for (let index = 0; index < charBytes+1; index++) {
+                firstByte.push(index===charBytes ? 0:1)
+            }
+            for (let index = 0; index < charBytes-1; index++) {
+                restBytes.push([1,0])
+            }
+            
+            let bytes = [...restBytes,firstByte];
+            const codePointInBinaryArr = codePointInBinary.split('')
+            for (const byte of bytes) {
+                const restBits = []
+                for (let index = 0; index < 8 - byte.length; index++) {
+                    if(codePointInBinaryArr.length){
+                        restBits.push(codePointInBinaryArr.pop())
+                    }else{
+                        restBits.push('0')
+                    }
+                }
+                byte.push(...restBits.reverse())
+            }
+            bytes = bytes.reverse().map(byte=>byte.join(''));
+            return bytes
+        }
+    }
+    console.log(UTF8_encoding('a'))
+    console.log(UTF8_encoding('严'))
+</script>

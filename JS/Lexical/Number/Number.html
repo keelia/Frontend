@@ -1,0 +1,95 @@
+<script>
+    //what 0.1,0.2 looks like in memory?
+    //var a = 0.1,b = 0.2;
+    // const memory1 = new Uint8Array(new Float64Array([0.1]).buffer)
+    // const memory2 = new Uint8Array(new Float64Array([0.2]).buffer)
+    // const items1 = [];
+    // for (const iterator of memory1) {
+    //     items1.push(new Array(8-iterator.toString(2).length+1).join('0') + iterator.toString(2))
+    // }
+    // console.log(items1)
+
+    // const items2 = [];
+    // for (const iterator of memory2) {
+    //     items2.push(new Array(8-iterator.toString(2).length+1).join('0') + iterator.toString(2))
+    // }
+    // console.log(items2)
+
+    //Regex for ALL JS Number
+    var decimalLiteralTest = [
+    '0','0.','0.1','0.11','.1','.11',
+    '1.','1.0','1.00','10.','10.0','10.001',
+    '1','10','100','1000.','10000.0','1010101.1','10000.00001',
+    '0e1','0.0E-0','0.e22','0.1E33','0.11E+1','.1E-1','.11e00',
+    '1.e1','1.0e3','1.00e4','10.e5','10.0e+1','10.001e-1',
+    '1e44','10e22','100E1000','1000.e999','10000.0e-222','1010101.1e+256','10000.00001e+1'
+    ];
+    var decimalLiteralFaliureTest = [
+        '..1','.E1','01','001'
+    ]
+
+var decimalLiteralRegex = /(0.?)|(0?.[1-9]+)|([1-9]+([0-9]+)?(.([0-9]+)?))?([eE][+-]?[0-9]+)?/g;
+// decimalLiteralTest.forEach(str=>console.log(decimalLiteralRegex.exec(str),str))
+
+var binaryLiteralTest = [
+    '0b0','0b1','0B0','0B1',
+    '0b1110','0b0001',
+    '0B111111110','0B0111111001',
+ ];
+
+var binaryLiteralRegex = /0[bB][01]+/;
+// binaryLiteralTest.forEach(str=>console.log(binaryLiteralRegex.test(str),str)) 
+
+var octalLiteralTest = [
+    '0o0','0O1','0O0','0O1',
+    '0o1234','0o567',
+    '0o1234576','0O0177111001',
+];
+
+var octalLiteralFaluireTest = [
+    '0O018989111001','000','001'
+];
+
+var octalLiteralRegex = /0[oO][0-7]+/;
+// octalLiteralTest.forEach(str=>console.log(octalLiteralRegex.test(str),str)) 
+
+var hexLiteralTest = [
+   '0x0','0Xc','0XA','0XB',
+   '0x123abc4','0x567DEF',
+   '0x12345efd76','0X0189ABC89111001',
+];
+
+var hexLiteralRegex = /0[xX][0-9a-fA-F]+/;
+// hexLiteralTest.forEach(str=>console.log(hexLiteralRegex.test(str),str)) 
+
+// var numberLiteralRegex = /(^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*))\.([0-9]*)([eE][+-]?[0-9]+)?$)|(^\.([0-9]+)([eE][+-]?[0-9]+)?$)/;
+// var numberLiteralRegex = /(^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*)).([0-9]*)([eE][+-]?[0-9]+)?$)|(^.([0-9]+)([eE][+-]?[0-9]+)?$)/;
+//  [...decimalLiteralTest].forEach(str=>console.log(numberLiteralRegex.test(str),str));
+// decimalLiteralFaliureTest.forEach(str=>console.log(numberLiteralRegex.test(str),str,str.match(numberLiteralRegex)))
+var numberLiteralRegex = /((^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*))\.([0-9]*)([eE][+-]?[0-9]+)?$)|(^\.([0-9]+)([eE][+-]?[0-9]+)?$))|(^0[bB][01]+$)|(^0[oO][0-7]+$)|(^0[xX][0-9a-fA-F]+$)/;
+// [...decimalLiteralTest,...binaryLiteralTest,...octalLiteralTest,...hexLiteralTest].forEach(str=>console.log(numberLiteralRegex.test(str),str)) ;
+[...octalLiteralFaluireTest].forEach(str=>console.log(numberLiteralRegex.test(str),str)) 
+
+
+
+// 0 ExponentPart?   0
+// 0 . ExponentPart? 0.
+// 0 . DecimalDigit ExponentPart? 0.1
+// 0 . DecimalDigits DecimalDigit ExponentPart? 0.11
+// . DecimalDigit ExponentPart? .1
+// . DecimalDigits DecimalDigit ExponentPart? .11
+// NonZeroDigit . ExponentPart? 1.
+// NonZeroDigit . DecimalDigit ExponentPart? 1.0
+// NonZeroDigit . DecimalDigits DecimalDigit ExponentPart? 1.00
+// NonZeroDigit DecimalDigit . ExponentPart? 10.
+// NonZeroDigit DecimalDigit . DecimalDigit ExponentPart? 10.0
+// NonZeroDigit DecimalDigit . DecimalDigits DecimalDigit ExponentPart? 10.001
+// NonZeroDigit ExponentPart? 1
+// NonZeroDigit DecimalDigit ExponentPart? 10
+// NonZeroDigit DecimalDigits DecimalDigit  ExponentPart? 100
+// NonZeroDigit DecimalDigits DecimalDigit . ExponentPart? 1000.
+// NonZeroDigit DecimalDigits DecimalDigit . DecimalDigit ExponentPart? 10000.0
+// NonZeroDigit DecimalDigits DecimalDigit . DecimalDigits DecimalDigit ExponentPart? 1000.0000
+
+
+</script>

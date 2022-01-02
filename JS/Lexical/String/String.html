@@ -1,0 +1,74 @@
+<script>
+// StringLiteral ::
+//     " DoubleStringCharacters? " ::
+//         " DoubleStringCharacter DoubleStringCharacters? " :: 
+//             " SourceCharacter but not one of " or \ or LineTerminator <LS> (SourceCharacter but not one of " or \ or LineTerminator <LS>)?"
+//             " <PS> <PS>? "
+//             " \ EscapeSequence (\ EscapeSequence)?" :: 
+//                 CharacterEscapeSequence :: 
+//                     SingleEscapeCharacter :: 
+//                         one of '"\bfnrtv
+//                     NonEscapeCharacter :: 
+//                         SourceCharacter but not one of EscapeCharacter or LineTerminator :: 
+//                             EscapeCharacter ::
+//                                 SingleEscapeCharacter :: 
+//                                     one of '"\bfnrtv
+//                                 DecimalDigit
+//                                 x u
+//                 0 [lookahead ∉ DecimalDigit] 
+//                 HexEscapeSequence :: 
+//                     x HexDigit HexDigit
+//                         HexDigit ::
+//                             0123456789abcdefABCDEF
+//                 UnicodeEscapeSequence:: 
+//                     u Hex4Digits :: 
+//                         HexDigit HexDigit HexDigit HexDigit
+//                     u{ CodePoint }
+//             " LineContinuation LineContinuation? ":: 
+//                 "\ LineTerminatorSequence":: 
+//                     <LF>
+//                     <CR>[lookahead ≠ <LF>] <LS>
+//                     <PS>
+//                     <CR><LF>
+//     ' SingleStringCharacters? ' :: 
+//         '  SingleStringCharacter SingleStringCharacters? ' :: 
+//             ' SourceCharacter but not one of ' or \ or LineTerminator <LS> (SourceCharacter but not one of ' or \ or LineTerminator <LS>)? '
+//             ' <PS> <PS>? '
+//             ' \ EscapeSequence (\ EscapeSequence)? '
+//             ' LineContinuation LineContinuation?'
+
+    const sourceCharRegex = /[\u{0000}-\u{10ffff}]/u
+    const sourceCharWithoutlineTerminators = /[\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{2027}\u{2030}-\u{10ffff}]/u;
+    const sourceCharWithoutlineTerminatorsAndReverse = /[\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{005b}\u{005d}-\u{2027}\u{2030}-\u{10ffff}]/u;
+    const sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote = /[\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{005b}\u{005d}-\u{2027}\u{2030}-\u{10ffff}]/u;
+    const $LineTerminatorsRegex = /[\u{000A}\u{000D}\u{2028}\u{2029}]/u
+    const $LSRegex = /\u{0028}/u;
+    const $PSRegex = /\u{0029}/u;
+    const LineContinuation = /\\([\u{000A}\u{2028}\u{2029}]|\u{000D}\u{000A}|\u{000D}(?!\u{000A}))/u ;//\ LineTerminatorSequence:<LF> <CR>[lookahead ≠ <LF>] <LS> <PS> <CR> <LF>
+        
+
+    const EscapeSequence = /(([\u{0027}\u{0022}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0076}])|([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{0026}\u{0028}\u{0029}\u{003a}-\u{005b}\u{005D}-\u{0061}\u{0063}-\u{0065}\u{0067}-\u{006d}\u{006f}-\u{0071}\u{0073}\u{0077}\u{0079}-\u{2027}\u{202a}-\u{10ffff}]))|(0(?![0-9]))|(x[0-9a-fA-F]{2})|(u(([0-9a-fA-F]{4})|(\{[0-9a-fA-F]{1,6}\})))/u;// CharacterEscapeSequence 0 [lookahead ∉ DecimalDigit] HexEscapeSequence UnicodeEscapeSequence
+    const CharacterEscapeSequence = /([\u{0027}\u{0022}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0076}])|([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{0026}\u{0028}\u{0029}\u{003a}-\u{005b}\u{005D}-\u{0061}\u{0063}-\u{0065}\u{0067}-\u{006d}\u{006f}-\u{0071}\u{0073}\u{0077}\u{0079}-\u{2027}\u{202a}-\u{10ffff}])/u;//SingleEscapeCharacter | NonEscapeCharacter
+    const SingleEscapeCharacter = /[\u{0027}\u{0022}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0076}]/u;///['"\bfnrtv]/;
+    const NonEscapeCharacter = /[\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{0026}\u{0028}\u{0029}\u{003a}-\u{005b}\u{005D}-\u{0061}\u{0063}-\u{0065}\u{0067}-\u{006d}\u{006f}-\u{0071}\u{0073}\u{0077}\u{0079}-\u{2027}\u{202a}-\u{10ffff}]/u;//SourceCharacter but not one of EscapeCharacter or LineTerminator;
+            //^[\u{000A}\u{000D}\u{0022}\u{0027}\u{0030}-\u{0039}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0075}\u{0076}\u{0078}\u{2028}\u{2029}]
+
+    const EscapeCharacter  = /[\u{0022}\u{0027}\u{0030}-\u{0039}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0075}\u{0076}\u{0078}]/u;///['"\bfnrtv0-9xu]/
+    const LineTerminatorsRegexAndEscapeCharacter = /[\u{000A}\u{000D}\u{0022}\u{0027}\u{0030}-\u{0039}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0075}\u{0076}\u{0078}\u{2028}\u{2029}]/u;
+
+
+    const HexEscapeSequence = /x[0-9a-fA-F]{2}/u;//x HexDigit HexDigit
+    const UnicodeEscapeSequence = /u(([0-9a-fA-F]{4})|(\{[0-9a-fA-F]{1,6}\}))/u;//u Hex4Digits | u{ CodePoint } //CodePoint :: HexDigits but only if MV of HexDigits ≤ 0x10FFFF
+    // ['\u000A','\u000D','\u2028','\u2029','\\','"'].forEach(item=>console.log(item,!!item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote),item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote)));
+    // ['\u0009','\u000B','\u000C','\u2027','\u0100','\u0020','\u005e'].forEach(item=>console.log(item,item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote)))
+    // ['\'','"','\\','b','f','n','r','t','v','0','9','x','u','\u000A','\u000D','\u2028','\u2029'].forEach(item=>console.log('NonEscapeCharacter',item,item.match(NonEscapeCharacter)));
+    // ['\u0077','c','[','\u0029','\u0009','\u000f','\u0020'].forEach(item=>console.log('NonEscapeCharacter',item.match(NonEscapeCharacter)));
+
+   const DoubleStringCharacter = /([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{005b}\u{005d}-\u{2027}\u{2030}-\u{10ffff}])|(\u{2028})|(\u{2029})|((([\u{0027}\u{0022}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0076}])|([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{0026}\u{0028}\u{0029}\u{003a}-\u{005b}\u{005D}-\u{0061}\u{0063}-\u{0065}\u{0067}-\u{006d}\u{006f}-\u{0071}\u{0073}\u{0077}\u{0079}-\u{2027}\u{202a}-\u{10ffff}]))|(0(?![0-9]))|(x[0-9a-fA-F]{2})|(u(([0-9a-fA-F]{4})|(\{[0-9a-fA-F]{1,6}\}))))|(\\([\u{000A}\u{2028}\u{2029}]|\u{000D}\u{000A}|\u{000D}(?!\u{000A})))/u;
+   const DoubleStringCharacters = /(([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{005b}\u{005d}-\u{2027}\u{2030}-\u{10ffff}])|(\u{2028})|(\u{2029})|((([\u{0027}\u{0022}\u{005c}\u{0062}\u{0066}\u{006e}\u{0072}\u{0074}\u{0076}])|([\u{0000}-\u{0009}\u{000B}\u{000C}\u{000E}-\u{0021}\u{0023}-\u{0026}\u{0028}\u{0029}\u{003a}-\u{005b}\u{005D}-\u{0061}\u{0063}-\u{0065}\u{0067}-\u{006d}\u{006f}-\u{0071}\u{0073}\u{0077}\u{0079}-\u{2027}\u{202a}-\u{10ffff}]))|(0(?![0-9]))|(x[0-9a-fA-F]{2})|(u(([0-9a-fA-F]{4})|(\{[0-9a-fA-F]{1,6}\}))))|(\\([\u{000A}\u{2028}\u{2029}]|\u{000D}\u{000A}|\u{000D}(?!\u{000A}))))*/u;
+
+    // ['\u000A','\u000D','\u2028','\u2029','\\','"'].forEach(item=>console.log(item,!!item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote),item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote)));
+    // ['\u0009','\u000B','\u000C','\u2027','\u0100','\u0020','\u005e'].forEach(item=>console.log(item,item.match(sourceCharWithoutlineTerminatorsAndReverseAndDoubleQuote)))
+    ["iuytt"].forEach(item=>console.log('DoubleStringCharacters',item,item.match(DoubleStringCharacters)));
+
+</script>
