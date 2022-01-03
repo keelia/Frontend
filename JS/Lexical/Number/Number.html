@@ -125,7 +125,8 @@ var hexLiteralTest = [
 ];
 
 var hexLiteralRegex = /0[xX][0-9a-fA-F]+/;
-// hexLiteralTest.forEach(str=>console.log(hexLiteralRegex.test(str),str)) 
+var hexLiteralFaliureTest = ['0x']
+// hexLiteralTest.forEach(str=>console.log(hexLiteralRegex.test(str),str))
 
 // var numberLiteralRegex = /(^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*))\.([0-9]*)([eE][+-]?[0-9]+)?$)|(^\.([0-9]+)([eE][+-]?[0-9]+)?$)/;
 // var numberLiteralRegex = /(^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*)).([0-9]*)([eE][+-]?[0-9]+)?$)|(^.([0-9]+)([eE][+-]?[0-9]+)?$)/;
@@ -133,7 +134,7 @@ var hexLiteralRegex = /0[xX][0-9a-fA-F]+/;
 // decimalLiteralFaliureTest.forEach(str=>console.log(numberLiteralRegex.test(str),str,str.match(numberLiteralRegex)))
 var numberLiteralRegex = /((^((0?)|([1-9][0-9]*))([eE][+-]?[0-9]+)?$)|(^((0)|([1-9][0-9]*))\.([0-9]*)([eE][+-]?[0-9]+)?$)|(^\.([0-9]+)([eE][+-]?[0-9]+)?$))|(^0[bB][01]+$)|(^0[oO][0-7]+$)|(^0[xX][0-9a-fA-F]+$)/;
 // [...decimalLiteralTest,...binaryLiteralTest,...octalLiteralTest,...hexLiteralTest].forEach(str=>console.log(numberLiteralRegex.test(str),str)) ;
-[...octalLiteralFaluireTest].forEach(str=>console.log(numberLiteralRegex.test(str),str)) 
+[...hexLiteralFaliureTest].forEach(str=>console.log(numberLiteralRegex.test(str),str)) 
 
 
 
