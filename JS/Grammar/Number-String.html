@@ -1,0 +1,77 @@
+<script>
+    function StringToNumber(str,radix = 10){
+        let trimed_str = str.trim();
+        const sign = trimed_str[0] === '-' ? '-' :'+';
+        trimed_str = sign === '-' ? trimed_str.slice(1): trimed_str;
+        if(str.match(/^0[bB]/)){
+            radix = 2;
+            trimed_str = trimed_str.match(/^0[bB](.*)/)[1]
+        }else if(str.match(/^0[oO]/)){
+            radix = 8
+            trimed_str = trimed_str.match(/^0[oO](.*)/)[1]
+        }else if(str.match(/^0[xX]/)){
+            radix = 16
+            trimed_str = trimed_str.match(/^0[xX](.*)/)[1]
+        }
+        radix = radix || 10;
+        const exponentRegex = /(^(([1-9][0-9]*))([eE][+-]?[0-9]+)$)|(^(([1-9][0-9]*))\.([0-9]*)([eE][+-]?[0-9]+)$)|(^\.([0-9]+)([eE][+-]?[0-9]+)$)/;
+        let exponentPart = ''
+        if(trimed_str.match(exponentRegex)){
+            if(radix!==10){
+                radix = 10;
+            }
+            exponentPart = trimed_str.split(/[eE]/)[1]
+        }
+        const [integer,fraction=''] = trimed_str.split('.')
+        let _integer = 0,_fraction=0;
+        for (let index = 0; index < integer.length; index++) {
+            const char = integer[index];
+            _integer = (_integer+char.charCodeAt(0)-'0'.charCodeAt(0)) * (index === integer.length-1 ?1: radix)
+        } 
+        let _fraction_base = 1;
+        for (const char of fraction) {
+            _fraction_base /= radix;
+            _fraction+=(char.charCodeAt(0)-'0'.charCodeAt(0))*_fraction_base;
+        }
+        if(exponentPart){
+            return (_integer+_fraction)*(10**exponentPart)
+        }
+        console.log(exponentPart)
+        return _integer+_fraction
+    }
+    //console.log(StringToNumber('-1234.4321'))
+    console.log(StringToNumber('1.012e-8'))
+    // console.log(StringToNumber('1111',2),StringToNumber('1111',8),StringToNumber('1111',10),StringToNumber('1111',16)) //15,585,4369
+    // console.log(StringToNumber('0b1111'),StringToNumber('0O1111'),StringToNumber('0x1111')) //15,585,4369
+    function NumberToString(num,radix=10){
+        //TODO:四舍五入
+        if(num === 0){
+            return '0'
+        }
+        const sign = Math.abs(num)/num ? '-' :'+';
+        num = Math.abs(num);
+        let integer = Math.floor(num);
+        let fraction= num - integer;
+        let _integer = '';
+        if(integer===0){
+            _integer = '0'
+        }
+        while (integer>0) {
+            _integer = integer % radix + _integer;
+            integer = Math.floor(integer/radix);
+        }
+        if(fraction<=0){
+            return _integer;
+        }
+        let _fraction = '',MAX_LENGTH = 10;
+        while (fraction>0 && (_fraction.length < MAX_LENGTH)) {
+            _fraction += Math.floor(fraction * radix);
+            fraction = (fraction * radix) - Math.floor(fraction * radix);
+        }
+        return `${sign}${_integer}.${_fraction}`
+
+    }
+    //console.log(NumberToString(-10.01))
+    //console.log(NumberToString(123.321))
+    //console.log(NumberToString(123.321),NumberToString(0b1111),NumberToString(0O1111),NumberToString(0x1111),NumberToString(1.012e-8))
+</script>
