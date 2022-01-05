@@ -73,9 +73,3 @@ Runtime
   - [[Target]]
     - Value : any ECMAScript string or empty
     - Meaning : The target label for directed control transfers.专门给label用的，只有涉及到label的语句才会用这个字段,即break,countinue.只有iteration statement和switch statement可以消费这种带标签的countinue和break。其他的语句也可以加标签，但是没有用。
-
-
-
-
-
-- Lexical Environment
