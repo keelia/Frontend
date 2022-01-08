@@ -37,7 +37,7 @@ new Promise(function(resolve){
 
 ## Realm(*8.2 Realms*)
 每个realm都有一套完整的js内置对象(包含global对象-*18 The Global Object*，和其他一些global访问不到的对象)。
-[如何获得gloal对象的全部properties？]()
+[如何获得gloal对象的全部properties？](./GlobalObjectsGraph.html)
 
 ## Execution Context(*8.3 Execution Contexts*)
 Execution Context Stack:
