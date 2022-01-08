@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>JS Global Objects</title>
+        <style>
+            .catg{
+                display: flex;
+                flex-direction: column;
+            }
+            h1{
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>The Global Object</h1>
+        <div>
+            <h2>Graph : All Objects/Properties from <strong>The Global Object</strong></h2>
+            <i>Not including Value Properties, and SharedArrayBuffer which isn't supported by Chrome</i>
+            <div id="mountNode"></div>
+        </div>
+        <div class="catg">
+            <h2>All Properties of The Global Object</h2>
+            <section id="valueProsp">
+                <h2>Value Properties of the Global Object</h2>
+                <p>Infinity<br/>NaN<br/>undefined</p>
+            </section>
+            <section id="functionProps">
+                <h2>Function Properties of the Global Object</h2>
+                <p>eval<br/>isFinite<br/>isNaN<br/>parseFloat<br/>parseInt<br/>decodeURI<br/>decodeURIComponent<br/>encodeURI<br/>encodeURIComponent</p>
+            </section>
+            <section id="constructorProps">
+                <h2>Constructor Properties of the Global Object</h2>
+                <p> Array<br/>
+                    ArrayBuffer<br/> 
+                    Boolean <br/> 
+                    DataView <br/> 
+                    Date<br/> 
+                    Error<br/> 
+                    EvalError<br/> 
+                    Float32Array<br/> 
+                    Float64Array<br/> 
+                    Function <br/> 
+                    Int8Array <br/> 
+                    Int16Array<br/> 
+                    Int32Array<br/> 
+                    Map<br/> 
+                    Number <br/> 
+                    Object <br/> 
+                    Promise <br/> 
+                    Proxy <br/> 
+                    RangeError <br/> 
+                    ReferenceError <br/> 
+                    RegExp <br/> 
+                    Set<br/> 
+                    SharedArrayBuffer<br/> 
+                    String <br/> 
+                    Symbol<br/>
+                    SyntaxError<br/>
+                    TypeError<br/>
+                    Uint8Array<br/>
+                    Uint8ClampedArray<br/>
+                    Uint16Array<br/>
+                    Uint32Array<br/>
+                    URIError<br/>
+                    WeakMap<br/>
+                    WeakSet</p>
+            </section>
+            <section id="otherProps">
+                <h2>Other Properties of the Global Object</h2>
+                <p>Atomics<br/>JSON<br/>Math<br/>Reflect</p>
+            </section>
+        </div>
+        <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+        <script type="text/javascript">
+            const printableGlobalObjectProps = [
+                "eval",
+                "isFinite",
+                "isNaN",
+                "parseFloat",
+                "parseInt",
+                "decodeURI",
+                "decodeURIComponent",
+                "encodeURI",
+                "encodeURIComponent",
+                "Array",
+                "ArrayBuffer", 
+                "Boolean", 
+                "DataView", 
+                "Date", 
+                "Error", 
+                "EvalError", 
+                "Float32Array", 
+                "Float64Array", 
+                "Function", 
+                "Int8Array", 
+                "Int16Array", 
+                "Int32Array", 
+                "Map", 
+                "Number", 
+                "Object", 
+                "Promise", 
+                "Proxy", 
+                "RangeError", 
+                "ReferenceError", 
+                "RegExp", 
+                "Set", 
+                    //"SharedArrayBuffer", 
+                "String", 
+                "Symbol",
+                "SyntaxError",
+                "TypeError",
+                "Uint8Array",
+                "Uint8ClampedArray",
+                "Uint16Array",
+                "Uint32Array",
+                "URIError",
+                "WeakMap",
+                "WeakSet",
+                "Atomics",
+                "JSON",
+                "Math",
+                "Reflect"
+                ];
+                const queue = [],rootNodes=[];
+                for (const p of printableGlobalObjectProps) {
+                    const node = {
+                        id:p,
+                        label:p,
+                        children:[]
+                    }
+                    queue.push({
+                        path:[p],
+                        object:this[p],
+                        node
+                    })
+                    rootNodes.push(node)
+                }
+
+                const set = new Set();
+
+                let current;
+                while(queue.length){
+                    current = queue.shift();
+                //    console.log(current.path.join('.'))
+                    if(set.has(current.object)){
+                        continue;
+                    }
+                    set.add(current.object);
+                    for (const p of Object.getOwnPropertyNames(current.object)) {
+                        const property = Object.getOwnPropertyDescriptor(current.object,p);
+                        const rootNode = current.node,childNodes = [];
+                        let valueProp,accessorGetProp,accessorSetProp
+                        if (property.hasOwnProperty('value') 
+                            && (property.value instanceof Object) 
+                            && ((property.value !== null) && (typeof property.value === 'object'|| typeof property.value === 'function' ))) {
+                            const childNode = {
+                                label:p,
+                                children:[],
+                                id:current.path.concat([p]).join('-'),
+                            }
+                            queue.push({
+                                path:current.path.concat([p]),
+                                object:property.value,
+                                node:childNode
+                            })
+                            rootNode.children?.push(childNode)
+                        }
+                        if (property.hasOwnProperty('get')&&(typeof property.get === 'function')) {
+                            const childNode = {
+                                label:`${p}`,
+                                addtional:'getter',
+                                children:[],
+                                id:current.path.concat([p,'getter']).join('-'),
+                            }
+                            queue.push({
+                                path:current.path.concat([p]),
+                                object:property.get,
+                                node:childNode
+                            })
+                            rootNode.children?.push(childNode)
+                        }
+                        if (property.hasOwnProperty('set')&&(typeof property.set === 'function')) {
+                            const childNode = {
+                                label:`${p}`,
+                                addtional:'setter',
+                                children:[],
+                                id:current.path.concat([p,'setter']).join('-'),
+                            }
+                            queue.push({
+                                path:current.path.concat([p,'setter']),
+                                object:property.set,
+                                node:childNode
+                            })
+                            rootNode.children?.push(childNode)
+                        }
+                    }
+                }
+                const container = document.getElementById('mountNode');
+                const width = container.scrollWidth;
+                const height = container.scrollHeight || 1500;
+                const graph = new G6.TreeGraph({
+                container: 'mountNode',
+                width,
+                height,
+                modes: {
+                    default: [
+                    {
+                        type: 'collapse-expand',
+                        onChange: function onChange(item, collapsed) {
+                        const data = item.get('model');
+                        data.collapsed = collapsed;
+                        return true;
+                        },
+                    },
+                    'drag-canvas',
+                    'zoom-canvas',
+                    ],
+                },
+                defaultNode: {
+                    size: 26,
+                    anchorPoints: [
+                    [0, 0.5],
+                    [1, 0.5],
+                    ],
+                },
+                defaultEdge: {
+                    type: 'cubic-horizontal',
+                },
+                layout: {
+                    type: 'mindmap',
+                    direction: 'H',
+                    getHeight: () => {
+                    return 16;
+                    },
+                    getWidth: () => {
+                    return 16;
+                    },
+                    getVGap: () => {
+                    return 10;
+                    },
+                    getHGap: () => {
+                    return 50;
+                    },
+                },
+                });
+
+                let centerX = 0;
+                graph.node(function (node) {
+                    if (node.id === 'Global') {
+                        centerX = node.x;
+                    }
+
+                    return {
+                    label:`${node.label}${node.addtional||''}`,
+                    labelCfg: {
+                        position:
+                        node.children && node.children.length > 0
+                            ? 'left'
+                            : node.x > centerX
+                            ? 'right'
+                            : 'left',
+                        offset: 5,
+                    }
+                    };
+                });
+
+                graph.data({
+                    id:'Global',
+                    label:'The Global Object',
+                    children:rootNodes
+                });
+                graph.render();
+                graph.fitView();
+
+                if (typeof window !== 'undefined')
+                window.onresize = () => {
+                    if (!graph || graph.get('destroyed')) return;
+                    if (!container || !container.scrollWidth || !container.scrollHeight) return;
+                    graph.changeSize(container.scrollWidth, container.scrollHeight);
+                };
+
+
+                // let set = new Set();
+                // const queue = [...valueProsp,...functionProps,...constructorProps,...otherProps];
+
+                // let current;
+                // while(queue.length){
+                //     current = queue.shift();
+                //     if(set.has(current)){
+                //         continue;
+                //     }
+                //     set.add(current);
+                //     for (const p in Object.getOwnPropertyNames(current)) {
+                //         const property = Object.getOwnPropertyDescriptor(current,p);
+                //         if (property.hasOwnProperty('value') && property.value instanceof Object) {
+                //             queue.push(property.value)
+                //         }
+                //         if (property.hasOwnProperty('getter')) {
+                //             queue.push(property.getter)
+                //         }
+                //         if (property.hasOwnProperty('setter')) {
+                //             queue.push(property.setter)
+                //         }
+                //     }
+                // }
+        </script>
+    </body>
+</html>
