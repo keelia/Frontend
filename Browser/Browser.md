@@ -47,4 +47,26 @@ IP
          * Empty line
          * Response body
             1. node一般是使用[chunked transfer- encoding](https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1),就是一行数字表示下一行开始有多少个字符，然后直到有一行的数字是0
-            2. 因为tcp的数据是流式，因此没有办法用正则（无法保证一个chunked片段(*TrunkedBodyParser*)过来的时候刚好断在正确的位置，如`Content-Type: text/plain；Date: Sat, 08 （断在此处）Jan 2022 20:03:42 GMT`），而只能用状态机。
+            2. 因为tcp的数据是流式，因此没有办法用正则（无法保证一个chunked片段(*TrunkedBodyParser*)过来的时候刚好断在正确的位置，如`Content-Type: text/plain；Date: Sat, 08 （断在此处）Jan 2022 20:03:42 GMT`），而只能用[状态机](#状态机)。
+
+
+# 状态机
+[JS中实现有限状态机](./FSM.js)
+- 每个状态都是一个函数（纯函数，不依赖外部的环境来改变返回值）
+  * 函数参数是一个输入
+  * 在函数中编写当前状态的逻辑
+  * 返回值为下一个状态（也是一个函数）
+    * 如果return的next是个固定值，那就是Moore型的状态机
+    * 如果return得next跟input有关，是个if else，那就是mealy型的状态机
+- while循环调用状态函数
+```js 
+  function state(input){
+    //do something
+    return next//next state
+  }
+  while(input){
+    //获取输入
+    state = state(input)//把状态机的返回值（状态函数）作为下一个状态
+  }
+```
+
