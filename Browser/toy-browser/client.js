@@ -160,6 +160,7 @@ class ResponseParser{
     }
 }
 class TrunkedBodyParser{
+    //body是一行十六进制数代表接下来有多少个字符的内容；转行后开始内容；循环直到结束。
     constructor(){
         this.WAITING_LENGTH = 0;
         this.WAITING_LENGTH_LINE_END=1;
@@ -184,9 +185,9 @@ class TrunkedBodyParser{
                         this.isFinished = true;
                     }
                 }else{
-                    //因为length都是十进制数，一层一层往上加；得到length的长度
-                    this.length *= 10;
-                    this.length +=char.charCodeAt(0) - '0'.charCodeAt(0);
+                    //因为length都是十六进制数，一层一层往上加；得到length的长度
+                    this.length *= 16;
+                    this.length +=parseInt(char,16);
                 }
                 break;
             case this.WAITING_LENGTH_LINE_END:
