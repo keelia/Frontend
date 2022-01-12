@@ -1,4 +1,6 @@
-const net = require('net')
+const net = require('net');
+const parser = require('./parser')
+
 class Request{
     //method url=host+port+path
     //headers:Content-Type-default: application/x-www-form-urlencoded
@@ -231,7 +233,7 @@ void async function(){
         }
     });
     let response = await request.send();
-   console.log(response)
+    let dom = parser.parseHTML(response.body)
 }()
 
 
