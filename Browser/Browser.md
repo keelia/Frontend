@@ -48,6 +48,25 @@ IP
          * Response body
             1. node一般是使用[chunked transfer- encoding](https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1),就是一行数字表示下一行开始有多少个字符，然后直到有一行的数字是0
             2. 因为tcp的数据是流式，因此没有办法用正则（无法保证一个chunked片段(*TrunkedBodyParser*)过来的时候刚好断在正确的位置，如`Content-Type: text/plain；Date: Sat, 08 （断在此处）Jan 2022 20:03:42 GMT`），而只能用[状态机](#状态机)。
+2. **HTML=(parse)=>DOM Tree**: parse HTML string to DOM tree by following [HTML Tokenization](https://html.spec.whatwg.org/#data-state) and using FSM. 用FSM来分析html，html标准中已经规定了html的各个状态，toy-browser只挑选部分，完成最简版本。
+   1. 实现的状态有：
+    * 开始标签
+    * 结束标签
+    * 自封闭标签
+   2. 在状态函数里面处理状态迁移；创建currentToken全局变量记录当前的tokenType和tokenContent，在状态函数中写入currentToken，在tag end状态去提交token（e.g. Emit the current input character as a character token.）注意，提交的token还并不是html element，因为每次startTag/endTag都是分开作为独立的token提交，需要后续进一步的处理。
+   3. 处理属性
+      1. 属性值分为单引号，双引号，无引号，需要较多的状态函数去处理；
+      2. 处理属性的方式跟tag类似，创建全局变量记录当前的属性kv，然后在tag结束的时候把当前属性加在当前tag token上，再提交tag token。
+   4. emit的tag token 通过使用栈去构建DOM Tree`element = {type:'element',children:[],attributes:[]}`
+      1. 遇到tag start/开始标签的时候入栈
+      2. 遇到tag end/结束标签的时候出栈
+      3. 遇到selfClose时候认为入栈之后马上出栈
+      4. 形成的element的父元素是它入栈的栈顶（`stack[stack.length-1]`）
+      5. 预先创建一个document作为栈顶的element(`[{type:'document',children:[]}]`)，用来在children里面储存全部的自元素信息。因此最后解析完之后，这个栈也应该只剩下这一个元素。
+   5. 处理文本节点`if token.type == 'text'`
+      1. 多个文本标签的token过来需要合并,因此创建一个全局currentTextNode=null
+      2. 文本节点是不会入栈的，收到第一个token之后，直接放进children里面。
+
 
 
 # 状态机
