@@ -66,6 +66,20 @@ IP
    5. 处理文本节点`if token.type == 'text'`
       1. 多个文本标签的token过来需要合并,因此创建一个全局currentTextNode=null
       2. 文本节点是不会入栈的，收到第一个token之后，直接放进children里面。
+3. DOM Tree=(CSS Computing)=>DOM With CSS
+     1. Collect CSS rules(only considering rules inside style tag, not link tag)
+         * 用一个css parser库去parse style tag里面的css文本 : npm install [css](https://www.npmjs.com/package/css) to Accepts a CSS string and returns an AST object.
+         *  **在style tag end的时候去收集css rules，只有这个时候style tag里面的children才是收集全了，能拿到文本节点的css**。
+     2. CSS Computing
+         * 不同于在end tag的时候收集css rules，css computing的时机应该尽可能的早，尤其对于有很多子元素的元素比如main tag，如果放在end tag的时候计算，就要等很久，而main的子元素中如果有依赖于main的style的元素，就要在main的style计算之后，再此进行计算。**因此应该在每个element创建后，加上了tagName/attributes之后，进行计算**。理论上在计算element的css的时候，css规则已经全部收集完毕。
+         * 计算过程
+           * 判断当前元素是否匹配到css rules中的selector
+             * 收集当前元素和它全部的父元素：只有收集完元素的所有父元素（因为在dom tree的时候已经把element.parent记录了，只需要一层层向上找即可收集完全），才可以知道selector是否选中了当前元素。判断顺序是从当前元素开始，从当前元素向上层parent寻找（从里往外找,e.g. <\img/> -> <\div> -> <\body>）
+             * 拆分css rule里面的selector，也要拆分成从当前元素的selector向外/父亲的顺序（e.g #myid -> div -> body）;复杂选择器要拆分成单个元素的选择器，同循环匹配父元素队列
+             * `match(selector,element)` ,TODO - 可以处理的 selector 有 ： # tagName > [attr=value]，以及复合选择器 多个class的选择器
+           * 匹配之后加入element得computedStyle里面,准备计算优先级[specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity#selector_types)
+             * 参照[css level3里面的例子](https://www.w3.org/TR/2018/REC-selectors-3-20181106/#specificity)，四元组（inline，id，class，tag），按照每个选择器出现的次数去增加`[0,0,0,0]`，然后从高位到低位比较(inline->tag)。
+             * 为每个属性计算specificity，一起存进computedStyle里面，同样的属性比较specificity，然后高的覆盖低的。
 
 
 

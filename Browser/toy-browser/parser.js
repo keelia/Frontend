@@ -1,3 +1,4 @@
+const {addCSSRules,computeCSS} = require('./cssParser')
 const EOF = Symbol('EOF');//end of file 标识文件结束。可以用这种技巧处理绝大多数需要带结束的场景，不然状态机会一直等着结束；
 
 let stack = [{type:'document',children:[]}],currentTextNode=null;
@@ -9,7 +10,7 @@ module.exports.parseHTML = function parseHTML(html){//return dom tree
             state = state(char)
         }
         state = state(EOF);
-        console.log(stack[0])
+        return stack[0]
     } catch (error) {
         console.error(error)
     }
@@ -223,6 +224,7 @@ function emit(token){
             top.children = top.children || [];
             top.children.push(element);
             element.parent = top;
+            computeCSS(element)
 
             if(!token.isSelfClosing){
                 stack.push(element)
@@ -232,10 +234,13 @@ function emit(token){
             if(top.tagName !== token.tagName){
                 return new Error('Start Tag doesn\'t match')
             }else{
+                //Add CSS Rules here
+                if(top.tagName === 'style'){
+                    addCSSRules(top.children[0].content)
+                }
                 stack.pop()
             }
             currentTextNode = null
         }
-        //stack.push(token)
     }
 }
