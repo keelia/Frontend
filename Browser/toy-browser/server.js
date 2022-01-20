@@ -11,23 +11,39 @@ const server = http.createServer((req, res) => {
 //     <img id="myid"/>
 // </div>`);
 //   });
-    res.end(`<html lang="en">
+    res.end(`<html>
 <head>
 <style>
-body div #myid{
-    width:100px;
+#myDiv{
+    display: flex;
+    width:120px;
+    flexWrap:wrap-reverse;
     background-color: #ff5000;
+    height: 120px;
 }
-body div img{
+#div1{
     width:30px;
-    background-color: #ff1111;
+    background-color: #9db854;
+    height: 30px;
 }
+#div2{
+    width:60px;
+    background-color: #4511ff;
+    height: 60px;
+}
+#div3{
+    width:40px;
+    background-color: #eecc37;
+    height: 40px;
+}
+
 </style>
 </head>
 <body>
-<div id="mdDiv" class="myDivCls" disabled>
-    <img id="myid"/>
-    <img />
+<div id="myDiv">
+    <div id="div1"></div>
+    <div id="div2"></div>
+    <div id="div3"></div>
 </div>
 </body>
 </html>`);

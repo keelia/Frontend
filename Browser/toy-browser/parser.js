@@ -1,4 +1,5 @@
 const {addCSSRules,computeCSS} = require('./cssParser')
+const {layout} = require('./layout')
 const EOF = Symbol('EOF');//end of file 标识文件结束。可以用这种技巧处理绝大多数需要带结束的场景，不然状态机会一直等着结束；
 
 let stack = [{type:'document',children:[]}],currentTextNode=null;
@@ -208,6 +209,7 @@ function emit(token){
     }else{
         if(token.type === 'startTag'){
             let element = {
+                type:'element',
                 tagName:token.tagName,
                 children:[],
                 attributes:[]
@@ -228,6 +230,8 @@ function emit(token){
 
             if(!token.isSelfClosing){
                 stack.push(element)
+            }else{
+                layout(element)
             }
             currentTextNode = null
         }else if(token.type === 'endTag'){
@@ -238,6 +242,7 @@ function emit(token){
                 if(top.tagName === 'style'){
                     addCSSRules(top.children[0].content)
                 }
+                layout(top)
                 stack.pop()
             }
             currentTextNode = null

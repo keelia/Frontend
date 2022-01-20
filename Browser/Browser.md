@@ -80,7 +80,22 @@ IP
            * 匹配之后加入element得computedStyle里面,准备计算优先级[specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity#selector_types)
              * 参照[css level3里面的例子](https://www.w3.org/TR/2018/REC-selectors-3-20181106/#specificity)，四元组（inline，id，class，tag），按照每个选择器出现的次数去增加`[0,0,0,0]`，然后从高位到低位比较(inline->tag)。
              * 为每个属性计算specificity，一起存进computedStyle里面，同样的属性比较specificity，然后高的覆盖低的。
-
+4. Render ：Flex layout 
+   1. flex layout preset
+        * 确定main-axis/cross-axis，主轴就是flex-direction， 元素向哪个方向排布，交叉轴就是与主轴垂直的那个方位。
+        * flex layout需要知道子元素，因此在end tag的时候调用layout
+        * element.style预处理，px或者数字都parse成数字，方便后续layout计算位置；如果没有给element设置display:flex就当作它不存在;只排布非textnode的子元素。
+        * 记录main-axis/cross-axis的变量：`mainSize,crossSize`记录主轴/交叉轴的行进单位width/height,`mainStart,mainEnd,crossStart,crossEnd`,记录主轴/交叉轴的起点/终点方向`mainBase,mainSign,crossBase,crossSign`记录主轴/交叉轴计算的起点和计算的符号
+   2. 收集子元素进入元素内的“行”（flexLine，row或者col）
+        * 根据主轴尺寸mainSize判断每“行”是否装满了，nowrap强行加入第一行，不然超了的元素归入第二行；
+        * 将每个flexLine的主轴剩余空间mainSpace，和交叉轴所占空间crossSpace存入flexLine
+        *  *optional可以实现flex grow和flex shrink*
+   3. 找出元素的主轴尺寸：取决于justify-content
+        * 找出所有flex元素，它们的size需要看mainSpace，然后平均分配给他们
+        * 如果mainSpace是负数，所有flex元素size为零，其他元素等比压缩  
+   4. 计算元素的交叉轴尺寸：取决于align-content/align-items/align-self，同时会受到flex-wrap:wrap-reverse的影响
+        * 计算全部flexline的剩余交叉轴空间totalCrossSlot,然后通过align-content去分配flexline之间的交叉轴间距
+        * 然后align-items/align-self去确定每flexline内剩余空间以及元素在交叉轴方向的位置
 
 
 # 状态机
