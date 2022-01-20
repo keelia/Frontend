@@ -96,6 +96,7 @@ IP
    4. 计算元素的交叉轴尺寸：取决于align-content/align-items/align-self，同时会受到flex-wrap:wrap-reverse的影响
         * 计算全部flexline的剩余交叉轴空间totalCrossSlot,然后通过align-content去分配flexline之间的交叉轴间距
         * 然后align-items/align-self去确定每flexline内剩余空间以及元素在交叉轴方向的位置
+5. Render/Draw：install [dependency](https://www.npmjs.com/package/images)
 
 
 # 状态机

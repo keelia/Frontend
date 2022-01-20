@@ -18,25 +18,24 @@ const server = http.createServer((req, res) => {
     display: flex;
     width:120px;
     flexWrap:wrap-reverse;
-    background-color: #ff5000;
+    background-color: rgb(255, 80, 0);
     height: 120px;
 }
 #div1{
     width:30px;
-    background-color: #9db854;
+    background-color: rgb(157, 184, 84);
     height: 30px;
 }
 #div2{
     width:60px;
-    background-color: #4511ff;
+    background-color: rgb(69, 17, 255);
     height: 60px;
 }
 #div3{
     width:40px;
-    background-color: #eecc37;
+    background-color: rgb(238, 204, 55);
     height: 40px;
 }
-
 </style>
 </head>
 <body>

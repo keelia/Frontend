@@ -283,9 +283,6 @@ module.exports.layout = function layout(element){
         }
         currentCross += crossSign * (lineCrossSize + lineCrossSlot)
     }
-
-
-    
 }
 
 function getStyle(element){
