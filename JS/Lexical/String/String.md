@@ -4,7 +4,7 @@
 
 > But if a character takes two code-units, the value of the first code-unit is returned. Hence charCodeAt always returns value less than 65536. In this case, endianess of the system matters. There is a much better codePointAt prototype method that always returns the real code-point of a character but is not supported in IE.
 
-> **Should Keep code in Unicode-BPM(UCS) Scope.**
+> **Should Keep code in Unicode-BMP(UCS) Scope.**
 
 
 
