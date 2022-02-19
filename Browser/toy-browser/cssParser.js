@@ -63,7 +63,7 @@ function match(selector,element){
    }else if(selector.charAt(0) === '.'){
         const clsAttr = element.attributes.find(attr=>attr.attrName === 'class')
         //TODO multiple class supports
-        return idAttr && (idAttr.attrValue === selector.replace('.',''))
+        return clsAttr && (clsAttr.attrValue === selector.replace('.',''))
    }else{
        return element.tagName === selector
    }
