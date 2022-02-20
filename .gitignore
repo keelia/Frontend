@@ -3,3 +3,4 @@
 .vscode/**
 Browser/toy-browser/node_modules/**
 Browser/toy-browser/package-lock.json
+output.jpg

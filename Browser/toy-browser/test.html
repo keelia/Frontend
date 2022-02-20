@@ -9,27 +9,50 @@
     height: 120px;
 }
 #div1{
+    display: flex;
     width:30px;
     background-color: rgb(157, 184, 84);
     height: 30px;
 }
-#div2{
+#myDiv > #div2{
+    display: flex;
     width:60px;
     background-color: rgb(69, 17, 255);
     height: 60px;
 }
 #div3{
+    display: flex;
     width:40px;
     background-color: rgb(238, 204, 55);
     height: 40px;
 }
+a[title]{
+    background-color: rgb(111, 111, 111);
+}
+a , div.nested{
+    width: 10px;
+    height: 10px;
+    background-color: rgb(15 234 3);
+}
+
+
+a.second-nested[href*="example"]{
+    background-color: rgb(33, 33, 33);
+}
+div div.third-nested{
+    height: 60px;
+}
+
 </style>
 </head>
 <body style="background-color: black;">
-<div id="myDiv">
+<div id="myDiv" class="my-div">
     <div id="div1"></div>
-    <div id="div2"></div>
-    <div id="div3"></div>
+    <div id="div2"  class="cls2"></div>
+    <div id="div3" class="cls3"></div>
+    <a class="nested first-nested" title></a>
+    <a class="nested second-nested" href="http://example"></a>
+    <div class="nested third-nested"></div>
 </div>
 </body>
 </html>
