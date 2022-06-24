@@ -121,3 +121,16 @@ toString
 > >    - a. Return key.
 > > 3. Return ! ToString(key).
 
+## Get Object
+```js
+var o = {};
+o = function(){};
+o= new Object();
+o = Object({});
+o = Object.create({})
+o = (function(){return this}).call({})
+o = JSON.parse('{}');
+o = Object.assign({});
+o = new (class cls{});
+```
+
