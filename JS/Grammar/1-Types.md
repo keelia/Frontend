@@ -134,3 +134,39 @@ o = Object.assign({});
 o = new (class cls{});
 ```
 
+## Show/Hide Text
+```js
+const ZeroWidthSpace = '\u200b';
+const ZeroWidthNonJoiner = '\u200c';
+const ZeroWidthJoiner = '\u200d';
+const ZeroWidthWithNoBreakSpace = '\ufeff';
+const Space = ' ';
+
+const hideText = text=>{
+    const zeroPad = chars=>'00000000'.slice(chars.length)+chars;
+    return text.split('').map(char=>zeroPad(char.codePointAt(0).toString(2))).join(Space)
+        .split('').map(binaryChar=>{
+            if(binaryChar === '1'){
+                return ZeroWidthSpace
+            }else if(binaryChar === '0'){
+                return ZeroWidthNonJoiner
+            }
+            return ZeroWidthJoiner
+        }).join('')
+}
+
+const showText = text=>text.split('').map(char=>{
+        if(char === ZeroWidthSpace){
+            return '1'
+        }else if(char === ZeroWidthNonJoiner){
+            return '0'
+        }
+        return Space
+    }).join('').split(Space).map(binary=>String.fromCodePoint(parseInt(binary,2))).join('');
+
+const hiddenText = hideText('hello world');
+
+console.log(hiddenText,showText(hiddenText))
+```
+
+
