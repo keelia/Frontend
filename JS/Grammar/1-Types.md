@@ -121,7 +121,7 @@ toString
 > >    - a. Return key.
 > > 3. Return ! ToString(key).
 
-## Get Object
+## [Get Object](https://262.ecma-international.org/9.0/#sec-well-known-intrinsic-objects)
 ```js
 var o = {};
 o = function(){};
@@ -134,7 +134,7 @@ o = Object.assign({});
 o = new (class cls{});
 ```
 
-## Show/Hide Text
+## [Show/Hide Text](https://www.codesky.me/archives/be-careful-what-you-copy-invisibly-inserting-usernames-into-text-with-zero-width-characters.wind)
 ```js
 const ZeroWidthSpace = '\u200b';
 const ZeroWidthNonJoiner = '\u200c';
@@ -167,6 +167,41 @@ const showText = text=>text.split('').map(char=>{
 const hiddenText = hideText('hello world');
 
 console.log(hiddenText,showText(hiddenText))
+```
+
+## Traffic lights
+```js
+const lights = [
+    {
+        color:'green',
+        wait:3
+    },
+    {
+        color:'yellow',
+        wait:1
+    },
+    {
+        color:'red',
+        wait:2
+    }
+];
+const sleep = seconds => new Promise(resolve=>{
+    setTimeout(() => {
+        resolve();
+    }, seconds);
+});
+
+let currentLightIndex = 0;
+const run = async function(){
+    while (lights.length) {
+        currentLight = lights[currentLightIndex]
+        // console.log(currentLight.color,new Date().toLocaleTimeString());
+        await sleep(currentLight.wait * 1000)
+        currentLightIndex = currentLightIndex+1
+        currentLightIndex = currentLightIndex > lights.length-1 ? 0 : currentLightIndex
+    }
+}
+run();
 ```
 
 
