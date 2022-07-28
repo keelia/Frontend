@@ -121,6 +121,31 @@ toString
 > >    - a. Return key.
 > > 3. Return ! ToString(key).
 
+# 用对象来模拟函数与构造器：函数对象与构造器对象
+> 函数对象：具有[[call]]私有字段的对象
+> 构造器对象：具有私有字段[[construct]]的对象
+> 任何对象只需要实现[[call]]，它就是一个函数对象，可以去作为函数被调用。而如果它能实现[[construct]]，它就是一个构造器对象，可以作为构造器被调用
+> 用户用 function 关键字创建的函数必定同时是函数和构造器。不过，它们表现出来的行为效果却并不相同。对于宿主(e.g.Image)和内置对象(e.g.Date)来说，它们实现[[call]]（作为函数被调用）和[[construct]]（作为构造器被调用）不总是一致的
+> => 语法创建的函数仅仅是函数，它们无法被当作构造器使用
+
+> 我们大致可以认为，它们[[construct]]的执行过程如下：
+> > 以 Object.prototype 为原型创建一个新对象；
+> > 以新对象为 this，执行函数的[[call]]；
+> > 如果[[call]]的返回值是对象，那么，返回这个对象，否则返回第一步创建的新对象。
+
+以上使得私有属性可以实现
+```js
+function cls(){
+    this.a = 100
+    return {
+        getValue:()=>this.a
+    }
+}
+const o = new cls();
+
+```
+
+
 ## [Get Object](https://262.ecma-international.org/9.0/#sec-well-known-intrinsic-objects)
 ```js
 var o = {};
