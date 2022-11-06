@@ -27,6 +27,7 @@
       - property
       - [variable](https://www.w3.org/TR/css-variables/#defining-variables)
     - [value](https://www.w3.org/TR/css-values-4/)
+      - [CSS functions](https://css-tricks.com/complete-guide-to-css-functions/)
 
 # 选择器
 ## 选择器语法
