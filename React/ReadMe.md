@@ -235,9 +235,18 @@ Dialog.Action = () => null;
 1. 使用类似 JSON 这样的 DSL（Domain Specific Language）作为 props，让组件内部逻辑解析 DSL 来决定如何渲染；
 2. 组件的组合（Composition）
 
+## React 17/18 中的 react/jsx-runtime
+> JSX 是 React.createElement 的语法糖。React 从 17 版本开始已经启用全新的 [JSX 运行时](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx#react-automatic-runtime)来替代 React.createElement
 
+在启用新 JSX 运行时的状态下，用代码编译器编译 JSX：
+- 在生产模式下被编译成了 react/jsx-runtime 下的 jsx 或 jsxs （目前同 jsx ）；
+- 在开发模式下 JSX 被编译成了 react/jsx-dev-runtime 下的 jsxDEV 。
 
+作为编译输入，JSX 的语法没有改变，编译输出无论是 jsx-runtime 还是 React.createElement 函数，它们的返回值也同样都是 React 元素。可见，代码编译器为开发者隐藏了新旧 API 的差异。这个变化并不影响已有的对 JSX 的理解。另外，如果是开发者手工创建 React 元素，依旧应该调用 React.createElement 。这个 API 并不会被移除。而 jsx-runtime 代码只应由编译器生成，开发者不应直接调用这个函数。
 
-
-
+引入新 JSX 运行时的动机主要是因为原有的 React.createElement 是为了类组件设计的，而目前函数组件已然成为主流，老接口限制了进一步的优化.与React.createElement 相比的变化包括：
+- 自动导入；
+- 在 props 之外传递 key 属性；
+- 将 children 直接作为 props 的一部分；
+- 分离生产模式和开发模式的 JSX 运行时。
 
