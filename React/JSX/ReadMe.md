@@ -1,5 +1,5 @@
 # Play around JSX without using React
-1. Use babel to transform jsx to js without using React.createElement/React.Fragment, using MyToReact instead.
+1. Use babel to transform jsx to js without using React.createElement/React.Fragment, using MyToyReact instead.
 - Configure customized pragma/pragmaFrag in package.json"
 - Write a jsx code file withMyToyReact.js
 - Import MyToyReact's MyElement, MyFragment

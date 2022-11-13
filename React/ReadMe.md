@@ -123,6 +123,61 @@ function App() {
 - 如果你构建出来的生产环境产物中，单个 JS 文件有好几个 MB 大小，那可以考虑利用构建工具的代码分割功能，将产物分成多个 chunk，每个 chunk JS 文件几百 KB，可以分摊整体 JS 体积，充分利用浏览器并行下载和缓存的特性优化应用加载速度
 - 除了这种业务无关的代码分割方式，在 React 中开发者也可以按功能模块或路由显式地分割应用，然后用**懒加载**的方式在浏览器中按需加载应用的一部分
 
+# Test
+## E2E Test
+> 端到端测试（End-to-End Testing，简称 E2E Testing），就是从最终用户体验出发，模拟真实的用户场景，验证软件行为和数据是否符合预期的测试
+### e2e testing using [Playwright](https://playwright.dev/)
+1. Intall Playwright
+2. package.json `e2e: playwright test`
+3. npm run e2e
+4. playwright.config.js -Run your local dev server before starting the tests  
+```js  
+webServer: {
+    command: 'npm run start',
+    port: 3000,
+}
+````
+
+5. specify browser package.json `"e2e:firefox": "playwright test --project=firefox"`
+
+### Other e2e Test tools
+主流的 Web 前端自动化 E2E 测试工具还包括 Cypress、Selenium。其中 Cypress 是在 Electron 基础上运行了一个高度自定义的浏览器环境，在这个环境中加入了自动化测试的各种功能和 API；而 Selenium 则是基于各个浏览器各自的 WebDriver。Playwright 与二者都不同，它使用了现代浏览器原生支持的CDP 协议（DevTools Protocol），标准较新，运行效率也更高一些。
+
+## Testability(应用的可测试性)
+- 测试脚本中，切忌使用太多 HTML 标签名来定位元素，如 page.locator('section') ，相当于是使用了 CSS 语法来查询元素，会使得测试和开发脚本. React 组件内是使用了还是 section 还是li，属于组件的内部实现，连同为源码的父组件都不应该知道，那外部的自动化测试脚本更不应该知道了。这样的写法会导致内部实现细节的泄漏，降低测试用例的可维护性。更何况，React 渲染生成的 DOM 结构往往比组件树复杂，E2E 脚本定位元素时常会有偏差，需要反复调整。看来应用源码和测试用例代码之间存在着 Gap。
+- 解决方式 可以利用 data-testid 字段。这个 HTML 元素字段并不属于哪个标准，但广泛被 Jest 等主流测试框架所采用。为html标签加入一个data-testid 属性，然后在测试用例中查询这个属性，这样就可以避免暴露 HTML 标签名这样的实现细节
+
+## Test Pyramid
+- 10% e2e(黑盒测试)
+- 70% intergration test(黑盒测试)
+- 20% unit test(白盒测试)
+
+> 白盒测试也称为结构测试，主要用于检测软件编码过程中的错误。 程序员的编程经验、对编程软件的掌握程度、工作状态等因素都会影响到编程质量，导致代码错误。 黑盒测试又称为功能测试，主要检测软件的每一个功能是否能够正常使用。
+
+## React Test
+> React 单元测试的范围和目标
+> - React 组件；
+> - 自定义 Hooks；
+> - Redux 的 Action、Reducer、Selector 等；
+> - 其他。
+
+*近年来 React 组件测试实践越来越丰富，根据实际需要，可以将父子组件写在同一个测试用例里，也可以组件带着自定义 Hooks 一起测。可以说，这已经逐渐模糊了组件单元测试和整合测试的界限。但类比连着真实数据库一起测的后端整合测试，前端 React 组件测试使用模拟（Mock）的比重还是很大的，所以这里依旧把组件测试归类到单元测试的范畴。*
+
+### React 技术社区最为流行的单元测试框架是 Jest + RTL（React Testing Library）
+开发测试用例时，你可以参照单元测试的[3A模式](https://wiki.c2.com/?ArrangeActAssert) : Arrange（准备）→ Act（动作）→ Assert（断言）。
+#### 定位元素
+- By Role : RTL 库的设计原则是：“你的测试代码越是贴近软件的真实用法，你从测试中得到的信心就越足。”所以 RTL 里的 API 设计，基本都不鼓励去深挖 DOM 结构这种实现细节。 findByRole 里的 Role 特指WAI-ARIA，即 W3C 推出的富互联网应用可访问性标准中的 Roles。HTML 里包括input在内的大部分标签都有默认的 Role，比标签名本身更具业务意义，具体可以参考这个[标准表格](https://www.w3.org/TR/html-aria/#docconformance)。
+- By data-testid : 如果你实在手痒想用 CSS 选择器或者 XPath 来查找 DOM 节点，可以折中一下，为 HTML 标签加入 data-testid
+
+#### 测试用例的内容
+- 预期路径（Happy Path），
+- 你还需要编写一些负向的用例（Negative Cases），用来测试出错的情况以及一些边界情况。
+
+#### 如何避免渲染子组件，只focus在当前组件？
+利用 Jest 的[模拟功能](https://zh-hans.reactjs.org/docs/testing-recipes.html#mocking-modules)，将被测组件所导入的其他组件替换成简化的模拟版本。
+
+#### hooks unit test
+可以使用RTL renderHook API，单元测试是不应该有副作用的。对于包含api call的hook，可以先用 jest.spyOn 方法将全局的 fetch 方法替换成了模拟函数，经过动作、断言，最后要记得把被替换的全局 fetch 方法还原。否则，有可能影响到其他测试用例。
 
 
 
