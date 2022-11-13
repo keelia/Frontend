@@ -179,6 +179,63 @@ webServer: {
 #### hooks unit test
 可以使用RTL renderHook API，单元测试是不应该有副作用的。对于包含api call的hook，可以先用 jest.spyOn 方法将全局的 fetch 方法替换成了模拟函数，经过动作、断言，最后要记得把被替换的全局 fetch 方法还原。否则，有可能影响到其他测试用例。
 
+## React Sub-Component设计模式的实现
+- Child Component，用于描述在 React 运行时（Runtime）构建的组件树（元素树）中，组件与组件之间的父子关系
+- Sub-components (附属组件/次级组件/副组件)，主要还是在描述设计时（Design-time）组件与组件间的强包含关系（Containment），而在运行时这些组件之间却不一定是父子关系
+
+### sub-component实现示例
+1. 在渲染时，这些真·子组件与其他自定义组件一样，会创建对应的 React 元素出来，但它们会导致元素树变得冗长。我们并不希望这样，而只想把它们当作是 Dialog 组件的一种扩展属性。这就需要在 Dialog 的 children 属性上做文章。首先基于 React.Children API，定义两个工具函数 findByType 和 findAllByType，用于选取 children 中特定类型的 React 元素
+2. 然后在 Dialog 组件函数体中，定义渲染标题、正文和动作按钮的函数，并在返回的 JSX 中调用它们
+```js
+function findByType(children, type) {
+  return React.Children.toArray(children).find(c => c.type === type);
+}
+
+function findAllByType(children, type) {
+  return React.Children.toArray(children).filter(c => c.type === type);
+}
+
+
+const Dialog = ({ modal, onClose, children }) => {
+  const renderTitle = () => {
+    const subElement = findByType(children, Dialog.Title);
+    if (subElement) {
+      const { className, style, children } = subElement.props;
+      return (<h1 {...{ className, style }}>{children}</h1>);
+    }
+    return null;
+  };
+  const renderContent = () => {
+    const subElement = findByType(children, Dialog.Content);
+    return subElement?.props?.children;
+  };
+  const renderButtons = () => {
+    const subElements = findAllByType(children, Dialog.Action);
+    return subElements.map(({ props: { onClick, children } }) => (
+      <button onClick={onClick} key={children}>{children}</button>
+    ));
+  };
+  return (
+    <dialog open>
+      <header>{renderTitle()}</header>
+      <main>{renderContent()}</main>
+      <footer>{renderButtons()}</footer>
+    </dialog>
+  );
+};
+Dialog.Title = () => null;
+Dialog.Content = () => null;
+Dialog.Action = () => null;
+```
+*更详细的例子请参考 Github 上 [Semantic-UI-React 的 v3 版本](https://github.com/Semantic-Org/Semantic-UI-React/tree/next-v3)。*
+### sub-component实现的好处
+1. 对于很多props的组件，sub-component将他们分类，使得dialog组件的props更加结构化、语义化
+2. 降低组件 props 结构与组件内部实现的耦合
+但除了使用sub-component，还可以通过别的方式实现这两个目标
+1. 使用类似 JSON 这样的 DSL（Domain Specific Language）作为 props，让组件内部逻辑解析 DSL 来决定如何渲染；
+2. 组件的组合（Composition）
+
+
 
 
 
