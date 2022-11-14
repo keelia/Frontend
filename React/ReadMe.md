@@ -250,3 +250,8 @@ Dialog.Action = () => null;
 - 将 children 直接作为 props 的一部分；
 - 分离生产模式和开发模式的 JSX 运行时。
 
+## Fiber 协调引擎
+React 组件会渲染出一棵元素树,每次有 props、state 等数据变动时，组件会渲染出新的元素树，React 框架会与之前的树做 Diffing 对比，将元素的变动最终体现在浏览器页面的 DOM 中。这一过程就称为协调（Reconciliation）
+
+在 React 的早期版本，协调是一个同步过程，这意味着当虚拟 DOM 足够复杂，或者元素渲染时产生的各种计算足够重，协调过程本身就可能超过 16ms，严重的会导致页面卡顿。而从 React v16 开始，协调从之前的同步改成了异步过程，这主要得益于新的 [Fiber 协调引擎](https://github.com/facebook/react/tree/v18.2.0/packages/react-reconciler)。
+
