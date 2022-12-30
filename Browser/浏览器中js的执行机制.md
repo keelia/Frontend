@@ -1,4 +1,3 @@
-
 # JavaScript 代码的执行流程
 一段 JavaScript 代码在执行之前需要被 JavaScript 引擎编译，编译完成之后，才会进入执行阶段
 ## 编译阶段
@@ -48,7 +47,8 @@
 
 
 ## 执行阶段
-JavaScript 引擎开始执行“可执行代码”，按照顺序一行一行地执行。JavaScript 引擎会从变量环境中去查找自定义的变量和函数。先是生成字节码，然后解释器可以直接执行字节码，输出结果。  但是通常Javascript还有个编译器，会把那些频繁执行的字节码编译为二进制，这样那些经常被运行的函数就可以快速执行了，通常又把这种解释器和编译器混合使用的技术称为JIT
+JavaScript 引擎开始执行“可执行代码”，按照顺序一行一行地执行。JavaScript 引擎会从变量环境中去查找自定义的变量和函数。先是生成字节码，然后解释器可以直接执行字节码，输出结果。  
+但是通常Javascript还有个编译器，会把那些频繁执行的字节码编译为二进制，这样那些经常被运行的函数就可以快速执行了，通常又把这种解释器和编译器混合使用的技术称为JIT
 
 # [作用域(scope)](./https://developer.mozilla.org/en-US/docs/Glossary/Scope)
 > 作用域是指在程序中定义变量的区域，该位置决定了变量的生命周期。通俗地理解，作用域就是变量与函数的可访问范围，即作用域控制着变量和函数的可见性和生命周期。
@@ -77,6 +77,8 @@ JavaScript 引擎开始执行“可执行代码”，按照顺序一行一行地
 ## Closure
 A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). In other words, a closure gives you access to an outer function's scope from an inner function. In JavaScript, closures are created every time a function is created, at function creation time.
 
+闭包如何产生的？（但扩大概念的话，其实只要有函数被创建就有闭包产生）
+
 在 JavaScript 中，根据词法作用域的规则，内部函数总是可以访问其外部函数中声明的变量，当通过调用一个外部函数返回一个内部函数后，即使该外部函数已经执行结束了，但是内部函数引用外部函数的变量依然保存在内存中，我们就把这些变量的集合称为闭包。
 
 闭包如何回收？
@@ -86,3 +88,98 @@ A closure is the combination of a function bundled together (enclosed) with refe
 闭包使用原则
 
 如果该闭包会一直使用，那么它可以作为全局变量而存在；但如果使用频率不高，而且占用内存又比较大的话，那就尽量让它成为一个局部变量。
+
+思考：
+```js
+var bar = { 
+    myName:"time.geekbang.com", 
+    printName: function () { 
+        console.log(myName) 
+    } 
+};
+function foo() { 
+    let myName = "极客时间" 
+    return bar.printName
+};
+let myName = "极客邦";
+let _printName = foo();
+_printName();
+bar.printName();
+```
+
+# This
+> 作用域链和 this 是两套不同的系统，它们之间基本没太多联系!
+
+this 是和执行上下文绑定的，也就是说每个执行上下文中都有一个 this
+![](./images/execution%20context-this.webp)
+
+执行上下文主要分为三种——全局执行上下文、函数执行上下文和 eval 执行上下文，所以对应的 this 也只有这三种:
+- 全局执行上下文中的 this:全局执行上下文中的 this 是指向 window 对象的。这也是 this 和作用域链的唯一交点，作用域链的最底端包含了 window 对象，全局执行上下文中的 this 也是指向 window 对象;
+- 函数中的 this :默认情况下调用一个函数，其执行上下文中的 this 也是指向 window 对象的.
+
+    如何设置函数执行上下文中的 this 值：
+    1. call/bind/apply
+    2. 通过一个对象来调用其内部的一个方法，该方法的执行上下文中的 this 指向对象本身。
+    3. [new](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new), 通过构造函数设置this。
+    
+        当执行 new CreateObj() 的时候，JavaScript 引擎做了如下四件事：
+        - 首先创建了一个空对象 tempObj；
+        - 接着调用 CreateObj.call 方法，并将 tempObj 作为 call 方法的参数，这样当 CreateObj 的执行上下文创建时，它的 this 就指向了 tempObj 对象；
+        - 然后执行 CreateObj 函数，此时的 CreateObj 函数执行上下文中的 this 指向了 tempObj 对象；
+        - 最后返回 tempObj 对象。
+    4. *箭头函数 箭头函数不会创建执行上下文，它里面的this会指向外层函数的this*
+```js
+function CreateObj(){
+  this.name = "极客时间"
+}
+var myObj = new CreateObj()
+
+//相当于：
+// var tempObj = {} 
+// CreateObj.call(tempObj) 
+// return tempObj
+```
+- eval 中的 this
+
+## this的设计缺陷及解决方案
+1. 嵌套函数中的 this 不会从外层函数中继承
+```js
+var myObj = {
+  name : "极客时间", 
+  showThis: function(){
+    console.log(this)
+    function bar(){console.log(this)}
+    bar()
+  }
+}
+myObj.showThis()
+```
+Solutions:
+- this 保存为一个 self 变量，再利用变量的作用域机制传递给嵌套函数。（本质是把 this 体系转换为作用域的体系）
+```js
+var myObj = {
+  name : "极客时间", 
+  showThis: function(){
+    console.log(this)
+    var self = this;//在 showThis 函数中声明一个变量 self 用来保存 this，然后在 bar 函数中使用 self
+    function bar(){
+      self.name = "极客邦"
+    }
+    bar()
+  }
+}
+myObj.showThis()
+console.log(myObj.name)
+console.log(window.name)
+```
+- 因为ES6 中的箭头函数并不会创建其自身的执行上下文，所以箭头函数中的 this 取决于它的外部函数。因此继续使用 this，但是要把嵌套函数改为箭头函数，因为箭头函数没有自己的执行上下文，所以它会继承调用函数中的 this。
+
+2. 普通函数中的 this 默认指向全局对象 window
+- 如果要让函数执行上下文中的 this 指向某个对象，最好的方式是通过 call 方法来显示调用。
+- 如果不希望函数默认this指向全局window，可以通过设置 JavaScript 的“严格模式”,在严格模式下，默认执行一个函数，其函数的执行上下文中的 this 值是 undefined
+
+## this总结
+- 当函数作为对象的方法调用时，函数中的 this 就是该对象；
+- 当函数被正常调用时，在严格模式下，this 值是 undefined，非严格模式下 this 指向的是全局对象 window；
+- 嵌套函数中的 this 不会继承外层函数的 this 值。
+- 因为箭头函数没有自己的执行上下文，所以箭头函数的 this 就是它外层函数的 this。
