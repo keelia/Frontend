@@ -68,3 +68,8 @@ JavaScript 引擎开始执行“可执行代码”，按照顺序一行一行地
 在词法环境内部，维护了一个小型栈结构，栈底是函数最外层的变量，进入一个作用域块后，就会把该作用域块内部的变量压到栈顶；当作用域执行完成之后，该作用域的信息就会从栈顶弹出，这就是词法环境的结构。
     - 当进入函数的作用域块时，作用域块中通过 let 声明的变量，会被存放在词法环境的一个单独的区域中，这个区域中的变量并不影响作用域块外面的变量，即使是同名变量（仅仅指通过let const声明的变量）
     - 代码执行时，沿着词法环境的栈顶向下查询，如果在词法环境中的某个块中查找到了，就直接返回给 JavaScript 引擎，如果没有查找到，那么继续在变量环境中查找。
+
+# Scope Chain 作用域链
+在每个执行上下文的变量环境中，都包含了一个外部引用，用来指向外部的执行上下文，我们把这个外部引用称为 outer。当一段代码使用了一个变量时，JavaScript 引擎首先会在“当前的执行上下文”中查找该变量，如果在当前的变量环境中没有查找到，那么 JavaScript 引擎会继续在 outer 所指向的执行上下文中查找，我们把这个查找的链条就称为作用域链；在 JavaScript 执行过程中，其作用域链是由[词法作用域](#词法作用域)决定的。
+## [词法作用域(Lexical scoping)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#lexical_scoping)
+词法作用域就是指作用域是由代码中函数声明的位置来决定的，所以词法作用域是静态的作用域，通过它就能够预测代码在执行过程中如何查找标识符。也就是说，词法作用域是代码编译阶段就决定好的，和函数是怎么调用的没有关系。The word lexical refers to the fact that lexical scoping uses the location where a variable is declared within the source code to determine where that variable is available. Nested functions have access to variables declared in their outer scope.
