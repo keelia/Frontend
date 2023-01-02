@@ -185,5 +185,6 @@ function evaluate(node) {
         }
     }
 }
-console.log(evaluate(source[0]))
+console.log('sss',evaluate(source[0]))
+console.log(source)
 
