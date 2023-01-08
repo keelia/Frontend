@@ -4,7 +4,7 @@
 ![](./images/js%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5.webp)
 输入一段代码，经过编译后，会生成两部分内容：执行上下文（Execution context）和可执行代码。
 
-**执行上下文**
+[**执行上下文**](https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide/In_depth#javascript_execution_contexts)
 
 > 是 JavaScript 执行一段代码时的运行环境，比如调用一个函数，就会进入这个函数的执行上下文，确定该函数在执行期间用到的诸如 this、变量、对象以及函数等。在执行上下文中存在一个变量环境的对象（Viriable Environment），该对象中保存了变量提升的内容，
 
