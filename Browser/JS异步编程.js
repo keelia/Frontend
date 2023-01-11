@@ -70,7 +70,7 @@ function co(generatorFunction) {
     }
     next()
 }
-co(fetchData)
+co(fetchData)//通过使用生成器配合执行器，就能实现使用同步的方式写出异步代码了，这样也大大加强了代码的可读性。
 
 
 
