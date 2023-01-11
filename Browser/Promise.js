@@ -59,7 +59,7 @@ function Bromise1(executor=()=>{}){
     }
 };
 //V2 - 微任务 延迟执行回调函数 并提高了代码效率
-function Bromise2(executor=()=>{}){
+function Bromise(executor=()=>{}){
     let _onFulfilled = null;
     let _onRejected = null;
 
@@ -83,51 +83,5 @@ function Bromise2(executor=()=>{}){
     }
 };
 
-// const myBromise = new Bromise(executor);
-// myBromise.then(successCallback,failureCallback);
-
-//V3 - Promise 回调返回值穿透技术/Chainable
-function Bromise(executor=()=>{}){
-    let _onFulfilled = null;
-    let _onRejected = null;
-
-    function resolve(value) {
-        queueMicrotask(()=>{
-            _onFulfilled(value)
-        })
-    }
-
-    function reject(value) {
-        _onRejected(value)
-    }
-    executor(resolve,reject);
-    return {
-        then:(onFulfilled, onRejected)=>{
-            _onFulfilled = onFulfilled;
-            _onRejected = onRejected;
-            return new Bromise(resolve=>resolve(101))
-        }
-    }
-};
-
-// const onFulfilled = value=>{
-//     console.log(`On Resolved:${value}`)
-//     let ret = new Bromise(resolve=>resolve(value+1))
-//     return ret;
-// };
-// const myBromise1 = new Bromise((resolve,reject)=>{
-//     resolve(100)
-// });
-//const myBromise2 = myBromise1.then(onFulfilled)
-// myBromise2.then(value=>console.log(`Chained:${value}`))
-
-let x1 = new Promise(resolve=>resolve(100))
-// let x2 = x1.then(value=>{
-//     return new Promise(resolve=>resolve(value+1))
-// })
-let x2 = x1.then()
-console.log(x2,x2===x1)
-// x2.then(value=>{
-//     console.log(value)
-//     console.log(x2)
-// })
+const myBromise = new Bromise(executor);
+myBromise.then(successCallback,failureCallback);
